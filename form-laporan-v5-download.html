@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Form Laporan Kebakaran Lahan — KLK</title>
+<style>
+:root {
+  --green:#27AE60;--dark:#1A2B3C;--red:#E74C3C;--orange:#E67E22;
+  --gray:#95A5A6;--light:#F8F9FA;--border:#DEE2E6;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:#F0F4F8;font-family:Arial,sans-serif;color:#333}
+.header{background:var(--dark);color:white;padding:14px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.header h1{font-size:16px;font-weight:bold}
+.header p{font-size:11px;color:#aaa;margin-top:2px}
+.steps{display:flex;background:white;border-bottom:1px solid var(--border);padding:0 4px;overflow-x:auto}
+.si{flex:0 0 auto;text-align:center;padding:8px 10px;font-size:10px;color:var(--gray);white-space:nowrap}
+.si.active{color:var(--green);font-weight:bold}
+.si.done{color:var(--dark)}
+.sn{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:2px solid var(--border);font-size:10px;font-weight:bold;margin-bottom:2px}
+.si.active .sn{border-color:var(--green);background:var(--green);color:white}
+.si.done .sn{border-color:var(--dark);background:var(--dark);color:white}
+.content{padding:14px;max-width:680px;margin:0 auto}
+.card{background:white;border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card-title{font-size:14px;font-weight:bold;color:var(--dark);margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid var(--light)}
+label{display:block;font-size:12px;font-weight:bold;color:#555;margin-bottom:4px}
+select,input[type=text],input[type=number],input[type=date],textarea{
+  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;color:#333;background:white;-webkit-appearance:none;outline:none;transition:border-color .2s}
+select:focus,input:focus,textarea:focus{border-color:var(--green)}
+textarea{min-height:80px;resize:vertical}
+.field{margin-bottom:12px}
+.sw{position:relative}
+.sw::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--gray);font-size:13px}
+.row2{display:flex;gap:10px}
+.row2>.field{flex:1}
+.hotspot-item{border:2px solid var(--border);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.hi-head{background:var(--dark);color:white;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;font-size:12px}
+.hn{background:var(--green);border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-weight:bold;font-size:11px;margin-right:6px}
+.maps-btn{background:rgba(255,255,255,.15);color:white;border:none;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;text-decoration:none}
+.hi-body{padding:12px}
+.coord-info{background:var(--light);border-radius:7px;padding:9px 11px;margin-bottom:10px;display:flex;gap:12px;flex-wrap:wrap;font-size:11px}
+.ci-label{color:var(--gray);margin-bottom:2px}
+.ci-value{font-weight:bold;color:var(--dark);font-size:12px}
+.status-group{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.status-btn{flex:1;min-width:80px;padding:8px 5px;border:2px solid var(--border);border-radius:7px;background:white;font-size:11px;font-weight:bold;cursor:pointer;text-align:center;transition:all .15s;color:#555}
+.status-btn.sel-api{border-color:#27AE60;background:#EAFAF1;color:#27AE60}
+.status-btn.sel-bukan{border-color:#E74C3C;background:#FDEDEC;color:#E74C3C}
+.status-btn.sel-bekas{border-color:#E67E22;background:#FEF9E7;color:#E67E22}
+/* PHOTO */
+.photo-section{margin-top:12px}
+.photo-tabs{display:flex;gap:5px;margin-bottom:8px}
+.photo-tab{flex:1;padding:7px;border:1.5px solid var(--border);border-radius:7px;background:white;font-size:11px;font-weight:bold;cursor:pointer;text-align:center;color:#555;transition:all .15s}
+.photo-tab.active{border-color:var(--dark);background:var(--dark);color:white}
+.upload-area{border:2px dashed var(--border);border-radius:9px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:var(--light);margin-bottom:8px}
+.upload-area:hover,.upload-area.drag-over{border-color:var(--green);background:#EAFAF1}
+.upload-area input[type=file]{display:none}
+.upload-area .ui{font-size:24px;margin-bottom:4px}
+.upload-area p{font-size:12px;color:var(--gray)}
+.upload-area .hint{font-size:10px;color:var(--gray);margin-top:3px}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(85px,1fr));gap:7px;margin-top:8px}
+.pt{position:relative;border-radius:7px;overflow:hidden;aspect-ratio:1;background:var(--light)}
+.pt img{width:100%;height:100%;object-fit:cover}
+.pt .del{position:absolute;top:3px;right:3px;background:rgba(231,76,60,.9);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pt .plb{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:white;font-size:9px;padding:2px 3px;text-align:center}
+/* BUTTONS */
+.btn{width:100%;padding:13px;border:none;border-radius:9px;font-size:14px;font-weight:bold;cursor:pointer;transition:opacity .2s}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--green);color:white}
+.btn-secondary{background:var(--light);color:var(--dark);border:1.5px solid var(--border)}
+.btn-row{display:flex;gap:10px}
+.btn-row .btn{flex:1}
+.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:20px;color:var(--gray);font-size:12px}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.alert{padding:10px 12px;border-radius:7px;font-size:12px;margin-bottom:12px}
+.alert-info{background:#EAF4FB;color:#2980B9;border:1px solid #AED6F1}
+.alert-error{background:#FDEDEC;color:#E74C3C;border:1px solid #F1948A}
+.alert-success{background:#EAFAF1;color:#27AE60;border:1px solid #A9DFBF}
+.shared-note{background:#EAF4FB;border:1px solid #AED6F1;border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:12px;color:#2980B9}
+/* SECTION divider */
+.section-divider{font-size:11px;font-weight:bold;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+/* REVIEW */
+.review-block{border:1.5px solid var(--border);border-radius:9px;margin-bottom:10px;overflow:hidden}
+.review-block-head{background:var(--dark);color:white;padding:7px 11px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.review-block table{width:100%;border-collapse:collapse;font-size:12px}
+.review-block td{padding:6px 10px;border-bottom:1px solid var(--border)}
+.review-block tr:last-child td{border-bottom:none}
+.review-block tr:nth-child(even) td{background:var(--light)}
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:bold}
+.badge-red{background:#FDEDEC;color:#E74C3C}
+.badge-green{background:#EAFAF1;color:#27AE60}
+.badge-orange{background:#FEF9E7;color:#E67E22}
+/* PROGRESS */
+.prog-wrap{background:var(--light);border-radius:10px;height:7px;margin:8px 0;overflow:hidden}
+.prog-fill{background:var(--green);height:100%;border-radius:10px;transition:width .3s}
+/* SUCCESS */
+.success-page{text-align:center;padding:40px 20px}
+.success-icon{width:65px;height:65px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:30px}
+.success-page h2{font-size:19px;color:var(--dark);margin-bottom:7px}
+.success-page p{color:var(--gray);font-size:13px;margin-bottom:22px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🔥 Laporan Kebakaran Lahan</h1>
+  <p>KLK Indonesia — Tim Lapangan</p>
+</div>
+
+<div class="steps">
+  <div class="si active" id="si1"><div><div class="sn">1</div></div><div>Identitas</div></div>
+  <div class="si" id="si2"><div><div class="sn">2</div></div><div>Tanggal</div></div>
+  <div class="si" id="si3"><div><div class="sn">3</div></div><div>Investigasi</div></div>
+  <div class="si" id="si4"><div><div class="sn">4</div></div><div>Lap. Formal</div></div>
+  <div class="si" id="si5"><div><div class="sn">5</div></div><div>Review</div></div>
+</div>
+
+<div class="content">
+
+<!-- ===== STEP 1 ===== -->
+<div id="page-1">
+  <div class="card">
+    <div class="card-title">📋 Langkah 1 — Identitas</div>
+    <div class="field">
+      <label>Nama Perusahaan *</label>
+      <div class="sw"><select id="sel-company"><option value="">-- Memuat... --</option></select></div>
+    </div>
+    <div class="field">
+      <label>Nama Investigator / Pembuat Laporan *</label>
+      <input type="text" id="inp-inv" placeholder="Nama lengkap Anda"/>
+    </div>
+    <div class="field">
+      <label>Jabatan</label>
+      <input type="text" id="inp-jabatan" placeholder="Contoh: Kepala Regu"/>
+    </div>
+    <div id="a1"></div>
+    <button class="btn btn-primary" onclick="goStep2()">Lanjut →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 2 ===== -->
+<div id="page-2" class="hidden">
+  <div class="card">
+    <div class="card-title">📅 Langkah 2 — Pilih Tanggal Kejadian</div>
+    <div id="ld" class="loading"><div class="spinner"></div> Memuat data hotspot...</div>
+    <div id="date-sec" class="hidden">
+      <div class="field">
+        <label>Tanggal Kejadian *</label>
+        <div class="sw"><select id="sel-date" onchange="onDateChange()"><option value="">-- Pilih tanggal --</option></select></div>
+      </div>
+      <div id="date-sum" class="hidden"></div>
+    </div>
+    <div id="a2"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(1)">← Kembali</button>
+      <button class="btn btn-primary" onclick="goStep3()">Lanjut →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 3 ===== -->
+<div id="page-3" class="hidden">
+  <div class="shared-note" id="s3-head"></div>
+  <div class="card">
+    <div class="card-title">📝 Informasi Umum Investigasi</div>
+    <div class="row2">
+      <div class="field"><label>Tanggal Investigasi *</label><input type="date" id="inp-tgl"/></div>
+      <div class="field"><label>Dilaporkan ke Instansi</label><input type="date" id="inp-tgl-ins"/></div>
+    </div>
+    <div class="field"><label>Catatan Umum</label><textarea id="inp-cat-umum" placeholder="Catatan yang berlaku untuk semua titik..."></textarea></div>
+  </div>
+  <div id="hs-container"></div>
+  <div id="a3"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goStep(2)">← Kembali</button>
+    <button class="btn btn-primary" onclick="goStep4()">Lanjut →</button>
+  </div>
+</div>
+
+<!-- ===== STEP 4: LAPORAN FORMAL ===== -->
+<div id="page-4" class="hidden">
+  <div class="card">
+    <div class="card-title">📄 Langkah 4 — Kelengkapan Laporan Formal</div>
+
+    <div class="section-divider">Identitas Surat</div>
+    <div class="row2">
+      <div class="field">
+        <label>No. Surat *</label>
+        <input type="text" id="inp-no-surat" placeholder="KOP.GMB/XX/IX/2026"/>
+      </div>
+      <div class="field">
+        <label>Tanggal Surat</label>
+        <input type="date" id="inp-tgl-surat"/>
+      </div>
+    </div>
+
+    <div class="section-divider">I. Peristiwa</div>
+    <div class="field">
+      <label>Keadaan Darurat</label>
+      <div class="sw">
+        <select id="inp-keadaan">
+          <option>Kebakaran Lahan</option>
+          <option>Kebakaran Bangunan</option>
+          <option>Kebakaran Alat Berat</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Lokasi / Blok-Desa</label>
+      <input type="text" id="inp-lokasi" placeholder="Contoh: Di Luar IUP Koperasi Garuda Maju Bersama"/>
+    </div>
+    <div class="field">
+      <label>Lokasi Detail (Blok/Desa)</label>
+      <input type="text" id="inp-blok" placeholder="Contoh: Buffer 1 KM Luar Koperasi Garuda Maju Bersama"/>
+    </div>
+
+    <div class="section-divider">II. Kronologis & Kemungkinan Bahaya Lanjutan</div>
+    <div class="field">
+      <label>a. Awal diketahui kebakaran *</label>
+      <textarea id="inp-kronologis-a" rows="4" placeholder="Jelaskan bagaimana kebakaran pertama kali diketahui, sumber informasi, waktu, titik koordinat yang ditemukan..."></textarea>
+    </div>
+    <div class="field">
+      <label>b. Tindakan yang diambil *</label>
+      <textarea id="inp-kronologis-b" rows="4" placeholder="Jelaskan tindakan yang dilakukan setelah kebakaran diketahui (penerbangan drone, pemadaman, koordinasi, dll)..."></textarea>
+    </div>
+    <div class="field">
+      <label>c. Kondisi api saat ini dan kemungkinan dampak *</label>
+      <textarea id="inp-kronologis-c" rows="4" placeholder="Jelaskan kondisi api saat investigasi dilakukan dan kemungkinan dampak yang ditimbulkan..."></textarea>
+    </div>
+
+    <div class="section-divider">Tanda Tangan</div>
+    <div class="row2">
+      <div class="field">
+        <label>Nama — Diketahui (Sr. Manager)</label>
+        <input type="text" id="inp-manager" placeholder="Nama Sr. Manager"/>
+      </div>
+      <div class="field">
+        <label>Nama — Dibuat</label>
+        <input type="text" id="inp-dibuat" placeholder="Nama pembuat laporan"/>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Jabatan</label>
+        <input type="text" id="inp-jbt-manager" placeholder="Sr. Manager"/>
+      </div>
+      <div class="field">
+        <label>Jabatan</label>
+        <input type="text" id="inp-jbt-dibuat" placeholder="Kepala Regu"/>
+      </div>
+    </div>
+
+    <div id="a4"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goStep(3)">← Kembali</button>
+      <button class="btn btn-primary" onclick="goStep5()">Review →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STEP 5: REVIEW ===== -->
+<div id="page-5" class="hidden">
+  <div class="card">
+    <div class="card-title">✅ Review & Kirim Laporan</div>
+    <div id="review-content"></div>
+    <div id="prog-sec" class="hidden">
+      <p style="font-size:12px;color:var(--gray);margin-bottom:5px" id="prog-lbl">Memproses...</p>
+      <div class="prog-wrap"><div class="prog-fill" id="prog-bar" style="width:0%"></div></div>
+    </div>
+    <div id="a5"></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn btn-secondary" onclick="goStep(4)">← Edit</button>
+      <button class="btn btn-primary" id="btn-submit" onclick="submitLaporan()">📤 Kirim & Generate PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUCCESS ===== -->
+<div id="page-success" class="hidden">
+  <div class="card success-page">
+    <div class="success-icon">✓</div>
+    <h2>Laporan Terkirim!</h2>
+    <p>PDF laporan kebakaran lahan untuk <b id="sc-company"></b> sudah ter-download otomatis. Silakan kirim PDF tersebut via email atau WhatsApp ke pihak yang diperlukan.</p>
+    <button class="btn btn-primary" onclick="resetForm()">+ Lapor Kejadian Lain</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const WEBHOOK = {
+  GET_HOTSPOTS: 'https://n8niotriau.duckdns.org/webhook/hotspot-log',
+  SUBMIT:       'https://n8niotriau.duckdns.org/webhook/laporan-lapangan',
+};
+
+let allHotspots=[], selectedDate='', currentHotspots=[], photos={};
+const MAX_PHOTOS=5;
+
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('inp-tgl').value=new Date().toISOString().slice(0,10);
+  document.getElementById('inp-tgl-surat').value=new Date().toISOString().slice(0,10);
+  loadCompanies();
+});
+
+async function loadCompanies(){
+  const sel=document.getElementById('sel-company');
+  try{
+    const r=await fetch(WEBHOOK.GET_HOTSPOTS+'?action=companies');
+    if(!r.ok)throw new Error();
+    const list=await r.json();
+    sel.innerHTML='<option value="">-- Pilih perusahaan --</option>';
+    list.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+  }catch(e){
+    const DEMO=['PT. Tekukur Indah','PT. Malindomas Perkebunan','PT. Hutan Hijau Mas','PT. Jabontara Eka Karsa','PT. Putra Bongan Jaya','PT. Sinergi Agro Industri','PT. Indonesia Plantation Synergy','PT. Karya Bakti Sejahtera Agrotama','PT. Mulia Agro Permai','PT. Menteng Jaya Sawit Perdana','PT. Karya Makmur Abadi','PT. Prima Bahagia Permai','PT. Satu Sembilan Delapan','PT. Adei Plantation and Industry (Nilo)','PT. Alam Karya Sejahtera','PT. Agro Makmur Abadi','PT. Bumi Makmur Sejahtera Jaya','PT. Langkat Nusantara Kepong','PT. Prima Alumga','PT. Parit Sembada','PT. Pinang Witmas Sejati','PT. Sekarbumi Alamlestari','PT. Safari Riau','PT. Steelindo Wahana Perkasa','PT. Adei Plantation and Industry (Mandau)','PT. Steelindo Wahana Perkasa (LM)'];
+    sel.innerHTML='<option value="">-- Pilih perusahaan --</option>';
+    DEMO.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});
+  }
+}
+
+async function goStep2(){
+  const company=document.getElementById('sel-company').value;
+  const inv=document.getElementById('inp-inv').value.trim();
+  const a=document.getElementById('a1');
+  if(!company){showAlert(a,'error','Pilih perusahaan terlebih dahulu.');return;}
+  if(!inv){showAlert(a,'error','Masukkan nama investigator.');return;}
+  a.innerHTML='';
+  // Auto-fill dibuat dengan nama investigator
+  document.getElementById('inp-dibuat').value=inv;
+  document.getElementById('inp-jbt-dibuat').value=document.getElementById('inp-jabatan').value||'Kepala Regu';
+  goStep(2);
+  await loadHotspots(company);
+}
+
+async function loadHotspots(company){
+  document.getElementById('ld').classList.remove('hidden');
+  document.getElementById('date-sec').classList.add('hidden');
+  try{
+    const r=await fetch(WEBHOOK.GET_HOTSPOTS+'?action=hotspots&company='+encodeURIComponent(company));
+    if(!r.ok)throw new Error();
+    allHotspots=await r.json();
+  }catch(e){
+    allHotspots=[
+      {date:'2026-09-19',lat:-2.02141,lon:112.54533,status:'Dalam Batas Plasma'},
+      {date:'2026-09-19',lat:-2.02673,lon:112.55399,status:'Buffer 1 KM (Luar Plasma)'},
+      {date:'2026-09-18',lat:-2.03607,lon:112.55064,status:'Buffer 1 KM (Luar Plasma)'},
+    ];
+  }
+  const dates=[...new Set(allHotspots.map(h=>h.date))].sort().reverse();
+  const sel=document.getElementById('sel-date');
+  sel.innerHTML='<option value="">-- Pilih tanggal --</option>';
+  dates.forEach(d=>{
+    const cnt=allHotspots.filter(h=>h.date===d).length;
+    const o=document.createElement('option');o.value=d;
+    o.textContent=`${fmt(d)}  (${cnt} titik hotspot)`;sel.appendChild(o);
+  });
+  document.getElementById('ld').classList.add('hidden');
+  document.getElementById('date-sec').classList.remove('hidden');
+  document.getElementById('date-sum').classList.add('hidden');
+}
+
+function onDateChange(){
+  selectedDate=document.getElementById('sel-date').value;
+  const sum=document.getElementById('date-sum');
+  if(!selectedDate){sum.classList.add('hidden');return;}
+  currentHotspots=allHotspots.filter(h=>h.date===selectedDate);
+  let html=`<div class="alert alert-info"><b>${currentHotspots.length} titik hotspot</b> pada ${fmt(selectedDate)}:<ul style="margin:7px 0 0 14px;">`;
+  currentHotspots.forEach((h,i)=>{
+    html+=`<li style="margin-bottom:3px;"><b>Hotspot ${i+1}</b> — ${fmtC(h.lon,h.lat)}
+      <a href="https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}" target="_blank" style="color:#2980B9;font-size:10px;"> 📍 Maps</a>
+      <br><span style="color:#555;font-size:10px;">${h.status}</span></li>`;
+  });
+  html+='</ul></div>';
+  sum.innerHTML=html;sum.classList.remove('hidden');
+}
+
+function goStep3(){
+  const a=document.getElementById('a2');
+  if(!selectedDate){showAlert(a,'error','Pilih tanggal kejadian.');return;}
+  if(currentHotspots.length===0){showAlert(a,'error','Tidak ada hotspot untuk tanggal ini.');return;}
+  a.innerHTML='';
+  const company=document.getElementById('sel-company').value;
+  document.getElementById('s3-head').innerHTML=`<b>🏢 ${company}</b> &nbsp;|&nbsp; 📅 ${fmt(selectedDate)} &nbsp;|&nbsp; 🔥 ${currentHotspots.length} titik hotspot`;
+  photos={};
+  currentHotspots.forEach((_,i)=>{photos[i]={drone:[],maps:[]};});
+  renderHsItems();
+  goStep(3);
+}
+
+function renderHsItems(){
+  const c=document.getElementById('hs-container');c.innerHTML='';
+  currentHotspots.forEach((h,i)=>{
+    const id=`hs${i}`;
+    const div=document.createElement('div');div.className='card';
+    div.innerHTML=`
+      <div class="hotspot-item">
+        <div class="hi-head">
+          <div><span class="hn">${i+1}</span><b>Hotspot ${i+1}</b></div>
+          <a href="https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}" target="_blank" class="maps-btn">📍 Maps</a>
+        </div>
+        <div class="hi-body">
+          <div class="coord-info">
+            <div><div class="ci-label">LON (X)</div><div class="ci-value">${parseFloat(h.lon).toFixed(5)} E</div></div>
+            <div><div class="ci-label">LAT (Y)</div><div class="ci-value">${Math.abs(parseFloat(h.lat)).toFixed(5)} ${h.lat<0?'S':'N'}</div></div>
+            <div><div class="ci-label">STATUS</div><div class="ci-value" style="font-size:10px;">${h.status}</div></div>
+          </div>
+          <div class="field">
+            <label>Lokasi/Blok-Desa</label>
+            <input type="text" id="blok-${id}" placeholder="Contoh: Blok A3, Desa Kuala Kuayan"/>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label>Hasil Konfirmasi *</label>
+            <div class="status-group" id="sg-${id}">
+              <button class="status-btn" onclick="pilihStatus(${i},'Ada Api',this,'sel-api')">🔥 Ada Api</button>
+              <button class="status-btn" onclick="pilihStatus(${i},'Bukan Api',this,'sel-bukan')">✅ Bukan Api</button>
+              <button class="status-btn" onclick="pilihStatus(${i},'Bekas Kebakaran',this,'sel-bekas')">⬛ Bekas Kebakaran</button>
+            </div>
+            <input type="hidden" id="konfirmasi-${id}"/>
+          </div>
+          <div class="row2" id="lr-${id}">
+            <div class="field"><label>Luas Terbakar (Ha)</label><input type="number" id="luas-${id}" placeholder="0.0" step="0.1" min="0"/></div>
+            <div class="field"><label>Kondisi Saat Ini</label><div class="sw"><select id="kondisi-${id}"><option value="">-- Pilih --</option><option>Api sudah padam</option><option>Api masih aktif</option><option>Sedang ditangani</option><option>Sudah dilaporkan ke instansi</option></select></div></div>
+          </div>
+          <div class="field"><label>Penyebab Kebakaran</label><div class="sw"><select id="penyebab-${id}"><option value="">-- Pilih --</option><option>Pembukaan Lahan</option><option>Kelalaian</option><option>Kesengajaan</option><option>Alam (Petir/Kemarau)</option><option>Tidak Diketahui</option><option>Bukan Api (False Alarm)</option></select></div></div>
+          <div class="field"><label>Catatan</label><textarea id="catatan-${id}" placeholder="Keterangan tambahan..."></textarea></div>
+          <div class="photo-section">
+            <div style="font-size:12px;font-weight:bold;color:#555;margin-bottom:8px;">📷 Foto Lampiran</div>
+            <div class="photo-tabs">
+              <button class="photo-tab active" id="tab-drone-${id}" onclick="switchTab(${i},'drone')">🚁 Foto Drone</button>
+              <button class="photo-tab" id="tab-maps-${id}" onclick="switchTab(${i},'maps')">🗺️ Screenshot Maps</button>
+            </div>
+            <div id="panel-drone-${id}">
+              <div class="upload-area" onclick="triggerUpload(${i},'drone')" ondragover="onDrag(event,${i},'drone',true)" ondragleave="onDrag(event,${i},'drone',false)" ondrop="onDrop(event,${i},'drone')">
+                <input type="file" id="file-drone-${id}" accept="image/*" multiple onchange="onFC(${i},'drone',this)"/>
+                <div class="ui">🚁</div><p>Tap untuk pilih foto drone</p><p class="hint">JPG/PNG/HEIC • Maks ${MAX_PHOTOS} foto • Auto-kompres</p>
+              </div>
+              <div class="photo-grid" id="grid-drone-${id}"></div>
+              <p style="font-size:10px;color:var(--gray);margin-top:4px;" id="cnt-drone-${id}"></p>
+            </div>
+            <div id="panel-maps-${id}" class="hidden">
+              <div class="upload-area" onclick="triggerUpload(${i},'maps')" ondragover="onDrag(event,${i},'maps',true)" ondragleave="onDrag(event,${i},'maps',false)" ondrop="onDrop(event,${i},'maps')">
+                <input type="file" id="file-maps-${id}" accept="image/*" multiple onchange="onFC(${i},'maps',this)"/>
+                <div class="ui">🗺️</div><p>Tap untuk pilih screenshot maps</p><p class="hint">Screenshot Google Maps / SAS Planet</p>
+              </div>
+              <div class="photo-grid" id="grid-maps-${id}"></div>
+              <p style="font-size:10px;color:var(--gray);margin-top:4px;" id="cnt-maps-${id}"></p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function switchTab(i,type){
+  const id=`hs${i}`;
+  ['drone','maps'].forEach(t=>{
+    document.getElementById(`tab-${t}-${id}`).classList.toggle('active',t===type);
+    document.getElementById(`panel-${t}-${id}`).classList.toggle('hidden',t!==type);
+  });
+}
+function triggerUpload(i,type){document.getElementById(`file-${type}-hs${i}`).click();}
+function onDrag(e,i,type,over){e.preventDefault();document.getElementById(`file-${type}-hs${i}`).closest('.upload-area').classList.toggle('drag-over',over);}
+function onDrop(e,i,type){e.preventDefault();document.getElementById(`file-${type}-hs${i}`).closest('.upload-area').classList.remove('drag-over');addFiles(i,type,Array.from(e.dataTransfer.files));}
+function onFC(i,type,input){addFiles(i,type,Array.from(input.files));input.value='';}
+
+async function addFiles(i,type,files){
+  const cur=photos[i][type];
+  const rem=MAX_PHOTOS-cur.length;
+  if(rem<=0){alert(`Maks ${MAX_PHOTOS} foto.`);return;}
+  for(const f of files.filter(f=>f.type.startsWith('image/')).slice(0,rem)){
+    const dataUrl=await compress(f,1200,.75);
+    cur.push({name:f.name,dataUrl});
+  }
+  renderGrid(i,type);
+}
+
+function compress(file,maxDim,q){
+  return new Promise(res=>{
+    const img=new Image();const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>maxDim||h>maxDim){if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;}}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',q));
+    };img.src=url;
+  });
+}
+
+function renderGrid(i,type){
+  const id=`hs${i}`;const list=photos[i][type];
+  document.getElementById(`grid-${type}-${id}`).innerHTML=list.map((p,pi)=>`
+    <div class="pt"><img src="${p.dataUrl}" alt=""/><button class="del" onclick="delPhoto(${i},'${type}',${pi})">×</button>
+    <div class="plb">${type==='drone'?'🚁':'🗺️'} ${pi+1}</div></div>`).join('');
+  document.getElementById(`cnt-${type}-${id}`).textContent=list.length>0?`${list.length}/${MAX_PHOTOS} foto`:'';
+  const ua=document.getElementById(`file-${type}-${id}`).closest('.upload-area');
+  ua.style.opacity=list.length>=MAX_PHOTOS?'.4':'1';ua.style.pointerEvents=list.length>=MAX_PHOTOS?'none':'auto';
+}
+
+function delPhoto(i,type,pi){photos[i][type].splice(pi,1);renderGrid(i,type);}
+
+function pilihStatus(idx,val,btn,cls){
+  const id=`hs${idx}`;
+  document.querySelectorAll(`#sg-${id} .status-btn`).forEach(b=>b.classList.remove('sel-api','sel-bukan','sel-bekas'));
+  btn.classList.add(cls);document.getElementById(`konfirmasi-${id}`).value=val;
+  document.getElementById(`lr-${id}`).style.display=(val==='Bukan Api')?'none':'flex';
+}
+
+function goStep4(){
+  const a=document.getElementById('a3');
+  if(!document.getElementById('inp-tgl').value){showAlert(a,'error','Masukkan tanggal investigasi.');return;}
+  for(let i=0;i<currentHotspots.length;i++){
+    if(!document.getElementById(`konfirmasi-hs${i}`).value){showAlert(a,'error',`Pilih hasil konfirmasi untuk Hotspot ${i+1}.`);return;}
+  }
+  a.innerHTML='';
+  // Auto-fill no surat suggestion
+  const now=new Date();
+  const months=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
+  if(!document.getElementById('inp-no-surat').value){
+    document.getElementById('inp-no-surat').value=`KOP.GMB/XX/${months[now.getMonth()]}/${now.getFullYear()}`;
+  }
+  goStep(4);
+}
+
+function goStep5(){
+  const a=document.getElementById('a4');
+  if(!document.getElementById('inp-no-surat').value){showAlert(a,'error','Masukkan nomor surat.');return;}
+  if(!document.getElementById('inp-kronologis-a').value){showAlert(a,'error','Isi narasi kronologis (poin a).');return;}
+  if(!document.getElementById('inp-kronologis-b').value){showAlert(a,'error','Isi tindakan yang diambil (poin b).');return;}
+  if(!document.getElementById('inp-kronologis-c').value){showAlert(a,'error','Isi kondisi saat ini (poin c).');return;}
+  a.innerHTML='';
+  buildReview();
+  goStep(5);
+}
+
+function buildReview(){
+  const company=document.getElementById('sel-company').value;
+  const inv=document.getElementById('inp-inv').value;
+  const noSurat=document.getElementById('inp-no-surat').value;
+  const tgl=document.getElementById('inp-tgl').value;
+  const manager=document.getElementById('inp-manager').value;
+
+  let html=`<div style="background:var(--light);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;">
+    <b>🏢 ${company}</b><br>
+    📄 ${noSurat} &nbsp;|&nbsp; 📅 Kejadian: ${fmt(selectedDate)} &nbsp;|&nbsp; 🔍 Investigasi: ${fmt(tgl)}<br>
+    👤 ${inv} ${manager?'&nbsp;|&nbsp; 🎖️ Diketahui: '+manager:''}
+  </div>`;
+
+  currentHotspots.forEach((h,i)=>{
+    const id=`hs${i}`;
+    const konfirmasi=document.getElementById(`konfirmasi-${id}`).value;
+    const luas=document.getElementById(`luas-${id}`).value;
+    const kondisi=document.getElementById(`kondisi-${id}`).value;
+    const penyebab=document.getElementById(`penyebab-${id}`).value;
+    const blok=document.getElementById(`blok-${id}`).value;
+    const nDrone=photos[i].drone.length;const nMaps=photos[i].maps.length;
+    let badge=konfirmasi==='Ada Api'?'<span class="badge badge-red">🔥 Ada Api</span>':
+      konfirmasi==='Bukan Api'?'<span class="badge badge-green">✅ Bukan Api</span>':
+      '<span class="badge badge-orange">⬛ Bekas Kebakaran</span>';
+    html+=`<div class="review-block">
+      <div class="review-block-head"><span><b>Hotspot ${i+1}</b> — ${fmtC(h.lon,h.lat)}</span>${badge}</div>
+      <table><tr><td style="color:#888;width:40%;">Lokasi/Blok</td><td>${blok||'-'}</td></tr>
+      <tr><td style="color:#888;">Luas Terbakar</td><td>${luas?luas+' Ha':'-'}</td></tr>
+      <tr><td style="color:#888;">Kondisi</td><td>${kondisi||'-'}</td></tr>
+      <tr><td style="color:#888;">Penyebab</td><td>${penyebab||'-'}</td></tr>
+      <tr><td style="color:#888;">Foto</td><td>${nDrone>0?'🚁 '+nDrone+' drone':''} ${nMaps>0?'🗺️ '+nMaps+' maps':''} ${nDrone+nMaps===0?'-':''}</td></tr>
+      </table>
+      ${renderThumbsPreview(i)}
+    </div>`;
+  });
+
+  html+=`<div class="review-block">
+    <div class="review-block-head"><span>📋 Kronologis</span></div>
+    <table>
+      <tr><td style="color:#888;width:30%;vertical-align:top;">a. Awal diketahui</td><td>${document.getElementById('inp-kronologis-a').value}</td></tr>
+      <tr><td style="color:#888;vertical-align:top;">b. Tindakan</td><td>${document.getElementById('inp-kronologis-b').value}</td></tr>
+      <tr><td style="color:#888;vertical-align:top;">c. Kondisi api</td><td>${document.getElementById('inp-kronologis-c').value}</td></tr>
+    </table>
+  </div>`;
+
+  document.getElementById('review-content').innerHTML=html;
+}
+
+function renderThumbsPreview(i){
+  const all=[...photos[i].drone,...photos[i].maps];
+  if(all.length===0)return'';
+  let h='<div style="display:flex;gap:5px;padding:7px 10px;flex-wrap:wrap;">';
+  all.forEach((p,pi)=>{
+    const type=pi<photos[i].drone.length?'🚁':'🗺️';
+    h+=`<div style="position:relative;width:52px;height:52px;border-radius:5px;overflow:hidden;">
+      <img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover;"/>
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:white;font-size:8px;text-align:center;padding:1px;">${type}</div></div>`;
+  });
+  return h+'</div>';
+}
+
+async function submitLaporan(){
+  const btn=document.getElementById('btn-submit');btn.disabled=true;
+  const prog=document.getElementById('prog-sec');
+  const bar=document.getElementById('prog-bar');
+  const lbl=document.getElementById('prog-lbl');
+  prog.classList.remove('hidden');
+
+  const company=document.getElementById('sel-company').value;
+  const inv=document.getElementById('inp-inv').value;
+  const jabatan=document.getElementById('inp-jabatan').value;
+  const tgl=document.getElementById('inp-tgl').value;
+  const tglIns=document.getElementById('inp-tgl-ins').value;
+  const catUmum=document.getElementById('inp-cat-umum').value;
+  const noSurat=document.getElementById('inp-no-surat').value;
+  const tglSurat=document.getElementById('inp-tgl-surat').value;
+  const keadaan=document.getElementById('inp-keadaan').value;
+  const lokasi=document.getElementById('inp-lokasi').value;
+  const blokDesa=document.getElementById('inp-blok').value;
+  const kronA=document.getElementById('inp-kronologis-a').value;
+  const kronB=document.getElementById('inp-kronologis-b').value;
+  const kronC=document.getElementById('inp-kronologis-c').value;
+  const manager=document.getElementById('inp-manager').value;
+  const jbtManager=document.getElementById('inp-jbt-manager').value;
+  const dibuat=document.getElementById('inp-dibuat').value;
+  const jbtDibuat=document.getElementById('inp-jbt-dibuat').value;
+
+  const titik=currentHotspots.map((h,i)=>{
+    const id=`hs${i}`;
+    return{
+      no:i+1,latitude:h.lat,longitude:h.lon,status_hotspot:h.status,
+      blok_desa:document.getElementById(`blok-${id}`).value,
+      hasil_konfirmasi:document.getElementById(`konfirmasi-${id}`).value,
+      luas_terbakar:parseFloat(document.getElementById(`luas-${id}`).value||0),
+      kondisi:document.getElementById(`kondisi-${id}`).value,
+      penyebab:document.getElementById(`penyebab-${id}`).value,
+      catatan:document.getElementById(`catatan-${id}`).value,
+      foto_drone:photos[i].drone.map(p=>({name:p.name,data:p.dataUrl})),
+      foto_maps:photos[i].maps.map(p=>({name:p.name,data:p.dataUrl})),
+    };
+  });
+
+  const payload={
+    company_name:company,investigator:inv,jabatan,
+    tanggal_hotspot:selectedDate,tanggal_investigasi:tgl,
+    tanggal_instansi:tglIns,catatan_umum:catUmum,
+    no_surat:noSurat,tanggal_surat:tglSurat,
+    keadaan_darurat:keadaan,lokasi,blok_desa:blokDesa,
+    kronologis_a:kronA,kronologis_b:kronB,kronologis_c:kronC,
+    nama_manager:manager,jabatan_manager:jbtManager,
+    nama_dibuat:dibuat,jabatan_dibuat:jbtDibuat,
+    titik_hotspot:titik,submitted_at:new Date().toISOString(),
+  };
+
+  // Animasi progress
+  for(let p=0;p<=80;p+=5){
+    await new Promise(r=>setTimeout(r,60));
+    bar.style.width=p+'%';
+    lbl.textContent=p<40?'Mengompres foto...':p<70?'Mengunggah laporan...':'Menyiapkan PDF...';
+  }
+
+  try{
+    bar.style.width='85%'; lbl.textContent='Menghubungi server...';
+
+    const response = await fetch(WEBHOOK.SUBMIT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+
+    bar.style.width='95%'; lbl.textContent='Mengunduh PDF...';
+
+    // Cek apakah response adalah PDF
+    const contentType = response.headers.get('Content-Type')||'';
+    if(contentType.includes('application/pdf') || contentType.includes('octet-stream')){
+      // Auto-download PDF
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safeName = company.replace(/[^a-zA-Z0-9]/g,'_');
+      const safeDate = selectedDate.replace(/-/g,'');
+      a.download = `Laporan_Kebakaran_${safeName}_${safeDate}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      // Fallback: response JSON biasa
+      await response.json().catch(()=>{});
+    }
+
+    bar.style.width='100%'; lbl.textContent='Selesai!';
+    await new Promise(r=>setTimeout(r,500));
+
+  }catch(e){
+    console.error('Submit error:', e);
+    showAlert(document.getElementById('a5'),'error','Gagal terhubung ke server. Coba lagi.');
+    prog.classList.add('hidden');
+    btn.disabled=false;
+    return;
+  }
+
+  prog.classList.add('hidden');
+  document.getElementById('sc-company').textContent=company;
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById('page-'+i)?.classList.add('hidden');
+    const si=document.getElementById('si'+i);si.classList.remove('active');si.classList.add('done');
+  });
+  document.getElementById('page-success').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+  btn.disabled=false;
+}
+
+function resetForm(){
+  allHotspots=[];selectedDate='';currentHotspots=[];photos={};
+  ['sel-company','sel-date','inp-keadaan'].forEach(id=>document.getElementById(id).value='');
+  ['inp-inv','inp-jabatan','inp-no-surat','inp-lokasi','inp-blok','inp-kronologis-a','inp-kronologis-b','inp-kronologis-c','inp-manager','inp-jbt-manager','inp-dibuat','inp-jbt-dibuat','inp-cat-umum','inp-tgl-ins'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inp-tgl').value=new Date().toISOString().slice(0,10);
+  document.getElementById('inp-tgl-surat').value=new Date().toISOString().slice(0,10);
+  document.getElementById('page-success').classList.add('hidden');
+  goStep(1);
+}
+
+function goStep(n){
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById('page-'+i)?.classList.add('hidden');
+    const si=document.getElementById('si'+i);
+    si.classList.remove('active','done');
+    if(i<n)si.classList.add('done');if(i===n)si.classList.add('active');
+  });
+  if(n<=5)document.getElementById('page-'+n)?.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showAlert(el,type,msg){el.innerHTML=`<div class="alert alert-${type}">${msg}</div>`;}
+function fmt(iso){if(!iso)return'-';const[y,m,d]=iso.split('-');const M=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];return`${parseInt(d)} ${M[parseInt(m)-1]} ${y}`;}
+function fmtC(lon,lat){return`${parseFloat(lon).toFixed(5)} E, ${Math.abs(parseFloat(lat)).toFixed(5)} ${lat<0?'S':'N'}`;}
+</script>
+</body>
+</html>
